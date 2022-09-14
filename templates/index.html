@@ -1,11 +1,28 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>My Checkout</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+        <title>Checkout</title>
     </head>
     <body>
-        <form action="/mandate" method="post">
-            <input type="submit" value="Create Mandate" />
-        </form>
+        {% if user %}
+            <p>Welcome, {{ user.name }}</p>
+            <p>You have £{{ balance / 100 }} left to pay off</p>
+
+            {% if user.mandate %}
+                <form action="/payment" method="post">
+                    <input type="submit" value="Make a £100 deposit" />
+                </form>
+            {% else %}
+                <form action="/mandate" method="post">
+                    <input type="submit" value="Create Mandate" />
+                </form>
+            {% endif %}
+        {% else %}
+            <form action="/login" method="get">
+                <input type="submit" value="Please Log In" />
+            </form>
+        {% endif %}
+        
     </body>
 </html>

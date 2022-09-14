@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>My Checkout</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+        <title>Deposit Submitted</title>
     </head>
     <body>
-        <p>Payment Created!</p>
-        <form action="/mandate/{{ mandate_id }}" method="get">
-            <input type="submit" value="Create Another?" />
-        </form>
+        {% if executed %}
+            <p>Deposit received!</p>
+            <a href="/">Back</a>
+        {% elif failure_reason %}
+            <p>Could not take payment: {{ failure_reason }}</p>
+        {% else %}
+            <p>Deposit pending...</p>
+        {% endif %}
     </body>
 </html>
