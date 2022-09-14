@@ -2,10 +2,10 @@
 from datetime import datetime, timedelta
 
 from sdk.models import Currency, MandateType, PeriodAlignment
-from sdk.mandate import create_mandate
+from sdk.mandate import create_mandate, get_mandate
 
 if __name__ == "__main__":
-    print(create_mandate({
+    mandate = create_mandate({
         'mandate': {
             'type': MandateType.sweeping,
             'provider_selection': {
@@ -39,4 +39,6 @@ if __name__ == "__main__":
                 }
             }
         }
-    }))
+    })
+    print(mandate)
+    print(get_mandate(mandate["id"]))
