@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My Checkout</title>
+    </head>
+    <body>
+        <form action="/payment" method="post">
+            <input type="hidden" value="{{ mandate_id }}" name="mandate_id" />
+            <input type="number" value="1" name="amount" />
+            <input type="submit" value="Create Payment" />
+        </form>
+    </body>
+</html>

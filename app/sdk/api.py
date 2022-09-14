@@ -13,6 +13,7 @@ from requests_oauthlib import OAuth2Session
 KID = os.getenv("TL_KID")
 CLIENT_ID = os.getenv("TL_CLIENT_ID")
 CLIENT_SECRET = os.getenv("TL_CLIENT_SECRET")
+PRIVATE_KEY = os.getenv("TL_PRIVATE_KEY")
 
 if not CLIENT_ID:
     raise ValueError("TL_CLIENT_ID not in Environment Variables")
@@ -20,26 +21,24 @@ if not CLIENT_SECRET:
     raise ValueError("TL_CLIENT_SECRET not in Environment Variables")
 if not KID:
     raise ValueError("TL_KID not in Environment Variables")
-
-with open("ec512-private.pem") as f:
-    PRIVATE_KEY = f.read()
-
 if not PRIVATE_KEY:
-    raise ValueError("ec512-private.pem file could not be found")
+    raise ValueError("TL_PRIVATE_KEY not in Environment Variables")
 
-# the base url to use
-TL_BASE_URL: str = "t7r.dev"
+print(CLIENT_ID, CLIENT_SECRET)
 
-client = BackendApplicationClient(client_id=CLIENT_ID)
-oauth = OAuth2Session(client=client)
-token = oauth.fetch_token(
-    token_url=f"https://auth.{TL_BASE_URL}/connect/token",
-    client_id=CLIENT_ID,
-    client_secret=CLIENT_SECRET)
-
+headers = {
+    'Content-Type': 'application/x-www-form-urlencoded'
+}
+data = {
+    'client_id': CLIENT_ID,
+    'client_secret': CLIENT_SECRET,
+    'grant_type': 'client_credentials',
+    'scope': 'payments recurring_payments:sweeping'
+}
+token = requests.post("https://auth.t7r.dev/connect/token", headers=headers, data=data).json()
 
 def do_api_request(method: HttpMethod, path: str, json_body: Optional[Any], query: Optional[Dict[str, str]]):
-    url = f"https://api.{TL_BASE_URL}{path}"
+    url = f"https://api.t7r.dev{path}"
     idempotency_key = str(uuid4())
 
     def datetime_conv(o):

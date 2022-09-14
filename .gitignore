@@ -3,3 +3,4 @@ env
 ec512-private.pem
 .mypy_cache
 __pycache__
+deployment.yaml

@@ -1,6 +1,6 @@
 import json
-from sdk.api import do_api_request
-from sdk.models import CreateMandateRequest
+from app.sdk.api import do_api_request
+from app.sdk.models import CreateMandateRequest
 from truelayer_signing import HttpMethod
 
 def create_mandate(mandate: CreateMandateRequest):
@@ -8,7 +8,7 @@ def create_mandate(mandate: CreateMandateRequest):
 
     try:
         res.raise_for_status()
-        return json.loads(res.content)
+        return res.json()
     except Exception:
         print(res.content.decode())
 
@@ -17,6 +17,6 @@ def get_mandate(mandate_id: str):
 
     try:
         res.raise_for_status()
-        return json.loads(res.content)
+        return res.json()
     except Exception:
         print(res.content.decode())
