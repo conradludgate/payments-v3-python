@@ -13,9 +13,11 @@ from truelayer_signing.errors import TlSigningException
 import json
 import requests
 import uvicorn
-from fastapi import FastAPI, Request, Header
+from fastapi import FastAPI, Request, Header, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+
+from app.sdk.payment import create_payment
 
 BASE_HOST = os.getenv("BASE_HOST")
 
@@ -23,12 +25,12 @@ app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
-async def root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def root():
+    return templates.TemplateResponse("index.html")
 
 @app.get("/mandate/{mandate_id}", response_class=HTMLResponse)
-async def mandate(request: Request, mandate_id: str):
-    return templates.TemplateResponse("index.html", {"request": request, "mandate_id": mandate_id})
+async def mandate(mandate_id: str):
+    return templates.TemplateResponse("mandate.html", {"mandate_id": mandate_id})
 
 @app.get("/callback")
 async def callback(mandate_id: str):
@@ -78,6 +80,19 @@ async def post_mandate():
     })
     print(resp)
     return RedirectResponse(resp["authorization_flow"]["actions"]["next"]["uri"], status_code=303)
+
+@app.post("/payment", response_class=HTMLResponse)
+async def post_payment(amount: int = Form(), mandate_id: str = Form()):
+    payment = create_payment({
+			"amount_in_minor": amount,
+			"currency":      "GBP",
+			"payment_method": {
+				"type":      "mandate",
+				"mandate_id": mandate_id,
+			}
+    })
+    print(payment)
+    return templates.TemplateResponse("payment.html", {"mandate_id": mandate_id})
 
 @app.get("/teapot", status_code=418, response_class=HTMLResponse)
 async def teapot():
