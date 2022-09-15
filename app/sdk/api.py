@@ -18,6 +18,8 @@ GH_CLIENT_ID = os.getenv("GH_CLIENT_ID")
 GH_CLIENT_SECRET = os.getenv("GH_CLIENT_SECRET")
 PRIVATE_KEY = os.getenv("TL_PRIVATE_KEY")
 
+TL_HOST = os.getenv("TL_HOST")
+
 if not TL_CLIENT_ID:
     raise ValueError("TL_CLIENT_ID not in Environment Variables")
 if not TL_CLIENT_SECRET:
@@ -38,19 +40,19 @@ data = {
     'grant_type': 'client_credentials',
     'scope': 'payments recurring_payments:sweeping'
 }
-token = requests.post("https://auth.t7r.dev/connect/token", headers=headers, data=data).json()
+token = requests.post(f"https://auth.{TL_HOST}/connect/token", headers=headers, data=data).json()
 token_time = datetime.now()
 
 def get_tl_token():
     global token, token_time
     if token_time + timedelta(seconds=int(token["expires_in"])) > datetime.now():
-        token = requests.post("https://auth.t7r.dev/connect/token", headers=headers, data=data).json()
+        token = requests.post(f"https://auth.{TL_HOST}/connect/token", headers=headers, data=data).json()
         token_time = datetime.now()
     return token["access_token"]
 
 
 def do_api_request(method: HttpMethod, path: str, json_body: Optional[Any], query: Optional[Dict[str, str]]):
-    url = f"https://api.t7r.dev{path}"
+    url = f"https://api.{TL_HOST}{path}"
     idempotency_key = str(uuid4())
 
     def datetime_conv(o):

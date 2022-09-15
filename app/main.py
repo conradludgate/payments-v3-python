@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from typing import Union
 import urllib
 import uuid
-from app.sdk.api import GH_CLIENT_ID, GH_CLIENT_SECRET
+from app.sdk.api import GH_CLIENT_ID, GH_CLIENT_SECRET, TL_HOST
 
 from app.sdk.auth_flow import start_auth_flow
 from app.sdk.models import Currency, MandateType, PeriodAlignment
@@ -58,7 +58,7 @@ async def root(
 async def login():
     query = urllib.parse.urlencode({
         'client_id': GH_CLIENT_ID, 
-        'redirect_uri': "https://vrp.conrad.cafe/login/github",
+        'redirect_uri': f"{BASE_HOST}/login/github",
         'state': 'vrp',
         'allow_signup': False,
     })
@@ -70,7 +70,7 @@ async def auth(code: str, request: Request):
     data = {
         'client_id': GH_CLIENT_ID, 
         'client_secret': GH_CLIENT_SECRET, 
-        'redirect_uri': "https://vrp.conrad.cafe/login/github",
+        'redirect_uri': f"{BASE_HOST}/login/github",
         'code': code,
     }
     headers = { 'Accept': 'application/json' }
@@ -111,7 +111,7 @@ async def post_mandate(id: str = Cookie(default=None)):
             },
             'beneficiary': {
                 'type': 'external_account',
-                'account_holder_name': 'Floob',
+                'account_holder_name': 'VRP Lending Co',
                 'account_identifier': {
                     'type': "sort_code_account_number",
                     'sort_code': "123456",
@@ -206,7 +206,7 @@ async def webhook(
 
     jws_header = extract_jws_header(tl_signature)
     jku = jws_header.jku
-    valid_jku = "https://webhooks.t7r.dev/.well-known/jwks"
+    valid_jku = f"https://webhooks.{TL_HOST}/.well-known/jwks"
     if jku != valid_jku:
         raise ValueError(f"Unpermitted jku {jku}")
 
